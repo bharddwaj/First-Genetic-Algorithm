@@ -98,7 +98,19 @@ public:
         }
         return fitness;
     }
-    
+    std::string getMostFitMember(){
+        int fitness = 0;
+        int score;
+        std::string sentence = "sm";
+        for (int i = 0; i < members.size(); i++) {
+            score = members[i].getFitness();
+            if (score > fitness) {
+                sentence =members[i].getGenes();
+                fitness = score;
+            }
+        }
+        return sentence;
+    }
     std::vector<Chromosome> mostFitMembers(){
         //returns vector of the members in ascending order based on fitness I believe
         std::map<int, Chromosome*> pop; //IMPORTANT can't store objects themselves in map but I can store pointers
@@ -114,37 +126,45 @@ public:
             
         }
         
-        
-        
         std::map<int, Chromosome*>::iterator it;
         for (it = pop.begin(); it != pop.end(); it++) {
             int key = it -> first; // first accesses the key while second accesses the value
+            //https://stackoverflow.com/questions/26281979/c-loop-through-map
             ranking.push_back(*pop[key]); //dereferencing pointer to get the actual object
         }
         return ranking;
     }
    
-    Chromosome crossOver(){
-        //generates child by switching the first n random elements between the two randomly selected parents resulting in two children
+    Chromosome crossOver(int numChanges){
+        //generates child by switching n random elements between the two randomly selected parents resulting in two children
         //then the function random returns one of the children
         std::random_device rd;
         std::mt19937 generator(rd());
         std::uniform_int_distribution<int> distribution(0, members.size() - 1); //second num is inclusive
         int rand_num = distribution(generator);
         int rand_num_2 = distribution(generator);
-        std::uniform_int_distribution<int> distribution2(0, members[0].getChromosomeLength() - 1);
+        std::uniform_int_distribution<int> distribution2(0, members[0].getChromosomeLength()); // inclusive
         int rand_num_3 = distribution2(generator);
         Chromosome parentOne = members[rand_num].copy();
         Chromosome parentTwo= members[rand_num_2].copy();
-        std::vector<char> child;
-        for (int i = 0; i < rand_num_3 + 1; i++) {
-            child.push_back(parentOne.genes[i]);
-            parentOne.genes[i] = parentTwo.genes[i];
+        
+        std::unordered_map<int, char> genesHolder;
+        for (int i = 0; i < numChanges; i++) {
+            std::random_device rd;
+            std::mt19937 generator(rd());
+            std::uniform_int_distribution<int> distribution2(0, members[0].getChromosomeLength() - 1); // inclusive
+            int rand_num_3 = distribution2(generator);
+            genesHolder[rand_num_3] = parentOne.genes[rand_num_3];
+            parentOne.genes[rand_num_3] = parentTwo.genes[rand_num_3];
         }
-        for (int i = 0; members[0].getChromosomeLength(); i++) {
-            parentTwo.genes[i] = child[i];
+        std::unordered_map<int, char>::iterator it;
+        for (auto it: genesHolder) {
+            int key = it.first; // first accesses the key while second accesses the value
+            char value = it.second;
+            parentTwo.genes[key] = value;
         }
         std::uniform_int_distribution<int> distribution3(0, 1);
+        
         int rand_num_4 = distribution3(generator);
         if (rand_num_4 == 0){
             return parentOne;
@@ -152,14 +172,35 @@ public:
         return parentTwo;
         
     }
-    void generateChildren(int numChildren){
-        //repeatedly calls crossover and adds the children to the population
-        for (int i = 0; i < numChildren; i++) {
-            members.push_back(crossOver());
+    Chromosome crossOver2(Chromosome parentOne,Chromosome parentTwo,int numChanges){
+        //generates child by switching n random elements between the two SELECTED parents resulting in two children
+        //then the function random returns one of the children
+        std::unordered_map<int, char> genesHolder;
+        for (int i = 0; i < numChanges; i++) {
+            std::random_device rd;
+            std::mt19937 generator(rd());
+            std::uniform_int_distribution<int> distribution2(0, members[0].getChromosomeLength() - 1); // inclusive
+            int rand_num_3 = distribution2(generator);
+            genesHolder[rand_num_3] = parentOne.genes[rand_num_3];
+            parentOne.genes[rand_num_3] = parentTwo.genes[rand_num_3];
         }
+        std::unordered_map<int, char>::iterator it;
+        for (auto it: genesHolder) {
+            int key = it.first; // first accesses the key while second accesses the value
+            char value = it.second;
+            parentTwo.genes[key] = value;
+        }
+        std::uniform_int_distribution<int> distribution3(0, 1);
+        std::random_device rd;
+        std::mt19937 generator(rd());
+        int rand_num_4 = distribution3(generator);
+        if (rand_num_4 == 0){
+            return parentOne;
+        }
+        return parentTwo;
+        
     }
-    
-    void mutation(int mutationPercent,Chromosome child,int numChanges){
+    void mutation(int mutationPercent,Chromosome &child,int numChanges){
         std::random_device rd;
         std::mt19937 generator(rd());
         std::uniform_int_distribution<int> distribution(0, 100);
@@ -179,20 +220,69 @@ public:
         }
     }
     
+    void generateChildren(int numChildren,int mutationPercent, int numMutationChanges,int numCrossoverChanges){
+        //repeatedly calls crossover and adds the children to the population
+        for (int i = 0; i < numChildren; i++) {
+            Chromosome child = crossOver(numCrossoverChanges);
+            mutation(mutationPercent, child, numMutationChanges);
+            members.push_back(child);
+            
+        }
+    }
+    
+    void generateChildren2(std::vector<Chromosome> fitMembers,int mutationPercent, int numMutationChanges,int numCrossoverChanges){
+        //generates multiple children by using mostFitMembers as parents
+        int j = 1;
+        for (int i = 0; i < fitMembers.size(); i++) {
+            Chromosome child = crossOver2(fitMembers[i],fitMembers[j],numCrossoverChanges);
+            mutation(mutationPercent, child, numMutationChanges);
+            members.push_back(child);
+            
+        }
+    }
+    
+    
+    
 };
 
 int main(int argc, const char * argv[]) {
     
-    //Chromosome c("Hello my name is",23);
-    
-   // std::cout << c.getChromosomeLength() << std::endl;
-   // std::cout << c.getGenes() << '\n';
-    Population p("hello my name is",40);
-    
-    std::vector<Chromosome> wut = p.mostFitMembers();
-    std::cout << p.mostFitMembers().size() << '\n';
-    for (int i = 0; i < p.mostFitMembers().size(); i++) {
-        std::cout << wut[i].getFitness() << '\n';
+    /*
+     START
+        Generate the initial population
+        Compute fitness
+        REPEAT
+        Selection
+        Crossover
+        Mutation
+        Compute fitness
+        UNTIL population has converged
+     STOP
+     */
+    std::string sentence = "hello my name is";
+    int popsize = 2000;
+    int mutationPercent = 10;
+    int numMutationChanges = sentence.size()/6;
+    int numCrossoverChanges = sentence.size()/2;
+    int numChildren = 300; //used for generateChildren()
+    int count = 0;
+    int threshold = sentence.size();
+    Population p(sentence,popsize);
+    int maxFitness = p.getMaxFitness();
+    while ( maxFitness < threshold) {
+        p.generateChildren(numChildren,mutationPercent,numMutationChanges,numCrossoverChanges);
+        std::vector<Chromosome> mostFit = p.mostFitMembers();
+        //p.generateChildren2(mostFit, mutationPercent, numMutationChanges,numCrossoverChanges);
+        maxFitness = p.getMaxFitness();
+        std::cout <<maxFitness << ' ' << threshold << '\n';
+        std::cout << "count" << count << '\n';
+        std::cout << "Most Fit Members" << mostFit.size() << '\n';
+        count++;
+        if (count ==2500) {
+            std::cout << p.getMostFitMember() << '\n';
+            break;
+        }
+        
     }
     return 0;
 }
