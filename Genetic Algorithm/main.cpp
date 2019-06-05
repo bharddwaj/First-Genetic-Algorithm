@@ -376,7 +376,7 @@ int main(int argc, const char * argv[]) {
      */
     std::string sentence = "to be or not to be";
     int popsize = 1000;
-    int mutationPercent = 5;
+    int mutationPercent = 25;
     int numMutationChanges = 1;
     int numCrossoverChanges = sentence.size()/2;
     int numChildren = 100; //used for generateChildren()
@@ -392,7 +392,7 @@ int main(int argc, const char * argv[]) {
     p.deletion(0);
     std::cout << "Num Members " << p.getNumPopulation() << '\n';
     /*
-     this was me checking to see whether the mutation function was working
+     //this was me checking to see whether the mutation function was working
     std::string one = p.members[0].getGenes();
     std::string two = p.members[0].getGenes();
     while (one == two) {
@@ -401,9 +401,15 @@ int main(int argc, const char * argv[]) {
         two = p.members[0].getGenes();
         std::cout << two << '\n';
     } */
+    /*
+     //this was me checking to see whether crossover3 works which it does
+    Chromosome child = p.crossOver3(p.members[0], p.members[1]);
+    std::cout <<p.members[0].getGenes() << '\n';
+    std::cout <<p.members[1].getGenes() << '\n';
+    std::cout <<child.getGenes() << '\n';
+     */
     
-    
-    for (int i = 0; i < 1000; i++) {
+    while(maxFitness != threshold ) {
         
          p.generateChildren3(numChildren, mutationPercent, numMutationChanges, numCrossoverChanges);
        
@@ -411,35 +417,16 @@ int main(int argc, const char * argv[]) {
         if (maxFitness >= 4) {
             p.deletion(maxFitness - 3);
         }
-        
-        std::cout <<  "Max Fitness "<< maxFitness << ' ' << threshold << '\n';
-        std::cout << "Min Fitness " << p.minFitness() << ' ' <<threshold << '\n';
-        std::cout << "count " << i << '\n';
-        std::cout << "Num Members " << p.getNumPopulation() << '\n';
-    }
-    /*
-    while ( maxFitness < threshold) {
-        //p.generateChildren(numChildren,mutationPercent,numMutationChanges,numCrossoverChanges);
-        std::vector<Chromosome> mostFit = p.mostFitMembers();
-        //p.generateChildren2(mostFit, mutationPercent, numMutationChanges,numCrossoverChanges);
-        p.generateChildren3(numChildren, mutationPercent, numMutationChanges, numCrossoverChanges);
-        
-        maxFitness = p.getMaxFitness();
-        //p.getAllGenes();
-        if (maxFitness > 5) {
-            //p.deletion(0);
+        if (p.getNumPopulation() > 16000) {
+            p.deletion(maxFitness - 1);
         }
-        //p.deletion(0);
         std::cout <<  "Max Fitness "<< maxFitness << ' ' << threshold << '\n';
         std::cout << "Min Fitness " << p.minFitness() << ' ' <<threshold << '\n';
         std::cout << "count " << count << '\n';
-        std::cout << "Num Members " << p.getNumPopulation() << '\n';
         count++;
-        if (count ==1500) {
-            std::cout << p.getMostFitMember() << '\n';
-            break;
-        }
-        
-    } */
+        std::cout << "Num Members " << p.getNumPopulation() << '\n';
+    }
+    std::cout << p.getMostFitMember() << '\n';
+    
     return 0;
 }
