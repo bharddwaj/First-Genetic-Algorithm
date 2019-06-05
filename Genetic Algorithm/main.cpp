@@ -80,17 +80,18 @@ public:
         return deep_copy;
     }
 };
-
+////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////
 class Population{
-private:
-    std::vector<Chromosome> members;
+ 
 public:
-    int sumOfAllFitness; //help with normalizing fitness and selecting which chromosomes reproduce more
+    std::vector<Chromosome> members;
+    long long sumOfAllFitness; //help with normalizing fitness and selecting which chromosomes reproduce more
     Population(std::string sent,int popsize){
         for (int i = 0; i < popsize; i ++ ) {
             members.push_back( Chromosome(sent,sent.size()) );
             members[i].calcFitness(); //calculating fitness for each chromosome
-            sumOfAllFitness += members[i].getFitness();
+            sumOfAllFitness += members[i].fitness;
         }
     }
     
@@ -146,7 +147,7 @@ public:
             std::cout << members[i].getGenes() << '\n';
         }
     }
-    
+    /*
     std::vector<Chromosome> mostFitMembers(){
         //returns vector of the members in ascending order based on fitness I believe
         std::map<int, Chromosome*> pop; //IMPORTANT can't store objects themselves in map but I can store pointers
@@ -207,7 +208,7 @@ public:
         }
         return parentTwo;
         
-    }
+    } */
     Chromosome crossOver2(Chromosome parentOne,Chromosome parentTwo,int numChanges){
         //generates child by switching n random elements between the two SELECTED parents resulting in two children
         //then the function random returns one of the children
@@ -265,7 +266,7 @@ public:
         int rand_var = distribution(generator);
         if (rand_var <= mutationPercent) {
             
-            for (int i = 0; i < members[0].getChromosomeLength() ; i++) {
+            for (int i = 0; i < numChanges ; i++) {
                 std::random_device rd;
                 std::mt19937 generator(rd());
                 std::uniform_int_distribution<int> distribution2(0, members[0].getChromosomeLength() - 1);
@@ -279,9 +280,12 @@ public:
     }
     void deletion(int threshold){
         //delete all elements below a certain threshold fitness
-        for (auto it = members.begin(); it != members.end(); ++it){
+        for (auto it = members.begin(); it != members.end();){
             if (it->fitness <= threshold) {
                 members.erase(it);
+            }
+            else{
+                ++it;
             }
         }
     }
@@ -294,7 +298,7 @@ public:
         }
         return minfitness;
     }
-    
+    /*
     void generateChildren(int numChildren,int mutationPercent, int numMutationChanges,int numCrossoverChanges){
         //repeatedly calls crossover and adds the children to the population
         for (int i = 0; i < numChildren; i++) {
@@ -314,7 +318,7 @@ public:
             members.push_back(child);
             
         }
-    }
+    } */
     
     void generateChildren3(int numChildren,int mutationPercent, int numMutationChanges,int numCrossoverChanges){
         //inefficient wheel of fortune method
@@ -325,7 +329,9 @@ public:
         int maxFitness = getMaxFitness();
         for (int i = 0; i < members.size(); i++) {
             fitness = members[i].fitness;
-            for (int j = 0; j < fitness; j++) {
+            int limit = (((float)(fitness))/((float)(members[i].getChromosomeLength())))*100;
+            
+            for (int j = 0; j < limit; j++) {
                 wheel.push_back(members[i]);
             }
             
@@ -340,12 +346,13 @@ public:
             int rand_var2 = distribution(generator);
             Chromosome parentOne = (wheel[rand_var]);
             Chromosome parentTwo =  (wheel[rand_var2]);
-            Chromosome child = crossOver2(parentOne,parentTwo, numCrossoverChanges);
-            //Chromosome child = crossOver3(parentOne,parentTwo);
+            //Chromosome child = crossOver2(parentOne,parentTwo, numCrossoverChanges);
+            Chromosome child = crossOver3(parentOne,parentTwo);
             mutation(mutationPercent, child, numMutationChanges);
            
             members.push_back(child);
         }
+        calcAllFitness();
         wheel.clear();
     }
     
@@ -368,9 +375,9 @@ int main(int argc, const char * argv[]) {
      STOP
      */
     std::string sentence = "to be or not to be";
-    int popsize = 200;
+    int popsize = 1000;
     int mutationPercent = 5;
-    int numMutationChanges = sentence.size()/6;
+    int numMutationChanges = 1;
     int numCrossoverChanges = sentence.size()/2;
     int numChildren = 100; //used for generateChildren()
     int count = 0;
@@ -381,11 +388,30 @@ int main(int argc, const char * argv[]) {
         std::cout << "hello world" << '\n';
     }
     p.calcAllFitness();
+    std::cout << "Num Members " << p.getNumPopulation() << '\n';
+    p.deletion(0);
+    std::cout << "Num Members " << p.getNumPopulation() << '\n';
+    /*
+     this was me checking to see whether the mutation function was working
+    std::string one = p.members[0].getGenes();
+    std::string two = p.members[0].getGenes();
+    while (one == two) {
+        std::cout << one << '\n';
+        p.mutation(mutationPercent, p.members[0], numMutationChanges);
+        two = p.members[0].getGenes();
+        std::cout << two << '\n';
+    } */
+    
+    
     for (int i = 0; i < 1000; i++) {
+        
          p.generateChildren3(numChildren, mutationPercent, numMutationChanges, numCrossoverChanges);
-        p.calcAllFitness();
-        maxFitness = p.getMaxFitness();
        
+        maxFitness = p.getMaxFitness();
+        if (maxFitness >= 4) {
+            p.deletion(maxFitness - 3);
+        }
+        
         std::cout <<  "Max Fitness "<< maxFitness << ' ' << threshold << '\n';
         std::cout << "Min Fitness " << p.minFitness() << ' ' <<threshold << '\n';
         std::cout << "count " << i << '\n';
