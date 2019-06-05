@@ -383,8 +383,9 @@ int main(int argc, const char * argv[]) {
     p.calcAllFitness();
     for (int i = 0; i < 1000; i++) {
          p.generateChildren3(numChildren, mutationPercent, numMutationChanges, numCrossoverChanges);
+        p.calcAllFitness();
         maxFitness = p.getMaxFitness();
-        
+       
         std::cout <<  "Max Fitness "<< maxFitness << ' ' << threshold << '\n';
         std::cout << "Min Fitness " << p.minFitness() << ' ' <<threshold << '\n';
         std::cout << "count " << i << '\n';
