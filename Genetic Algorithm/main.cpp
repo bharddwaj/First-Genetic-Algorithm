@@ -13,6 +13,7 @@
 #include <unordered_map>
 #include <map>
 
+//characters you can use in your phrase
 std::array<char, 29> characters = {'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x',
     'y','z',' ', '?', '.'};
 
@@ -341,16 +342,17 @@ public:
         for (int children = 0; children < numChildren; children++) {
             std::random_device rd;
             std::mt19937 generator(rd());
-            std::uniform_int_distribution<int> distribution(0, 100);
+            std::uniform_int_distribution<int> distribution(0, wheel.size() - 1);
             int rand_var = distribution(generator);
             int rand_var2 = distribution(generator);
             Chromosome parentOne = (wheel[rand_var]);
             Chromosome parentTwo =  (wheel[rand_var2]);
-            //Chromosome child = crossOver2(parentOne,parentTwo, numCrossoverChanges);
-            Chromosome child = crossOver3(parentOne,parentTwo);
+            Chromosome child = crossOver2(parentOne,parentTwo, numCrossoverChanges);
+            //Chromosome child = crossOver3(parentOne,parentTwo);
             mutation(mutationPercent, child, numMutationChanges);
            
             members.push_back(child);
+            
         }
         calcAllFitness();
         wheel.clear();
@@ -374,8 +376,8 @@ int main(int argc, const char * argv[]) {
      UNTIL population has converged
      STOP
      */
-    std::string sentence = "to be or not to be";
-    int popsize = 1000;
+    std::string sentence = "my name is bharddwaj vemulapalli";
+    int popsize = 2000;
     int mutationPercent = 25;
     int numMutationChanges = 1;
     int numCrossoverChanges = sentence.size()/2;
@@ -383,6 +385,8 @@ int main(int argc, const char * argv[]) {
     int count = 0;
     int threshold = sentence.size();
     Population p(sentence,popsize);
+    int stagnationCounter = 0;
+    int minFitness = p.minFitness();
     int maxFitness = p.getMaxFitness();
     if (p.allChromosomeLengths()) {
         std::cout << "hello world" << '\n';
@@ -414,10 +418,12 @@ int main(int argc, const char * argv[]) {
          p.generateChildren3(numChildren, mutationPercent, numMutationChanges, numCrossoverChanges);
        
         maxFitness = p.getMaxFitness();
-        if (maxFitness >= 4) {
-            p.deletion(maxFitness - 3);
+        minFitness = p.minFitness();
+        p.deletion(0);
+        if (maxFitness > 10) {
+            p.deletion(maxFitness - 5);
         }
-        if (p.getNumPopulation() > 16000) {
+        if (p.getNumPopulation() > 9000) {
             p.deletion(maxFitness - 1);
         }
         std::cout <<  "Max Fitness "<< maxFitness << ' ' << threshold << '\n';
