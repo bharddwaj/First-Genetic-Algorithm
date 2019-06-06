@@ -325,7 +325,7 @@ public:
         //inefficient wheel of fortune method
         //using weighted probabilities based on fitness to 'spin the wheel' for who reproduces
         //going to use normalization method sooner or later
-        std::vector<Chromosome> wheel;
+        std::vector<int> wheel;
         int fitness;
         int maxFitness = getMaxFitness();
         for (int i = 0; i < members.size(); i++) {
@@ -333,7 +333,7 @@ public:
             int limit = (((float)(fitness))/((float)(members[i].getChromosomeLength())))*100;
             
             for (int j = 0; j < limit; j++) {
-                wheel.push_back(members[i]);
+                wheel.push_back(i);
             }
             
             
@@ -345,8 +345,8 @@ public:
             std::uniform_int_distribution<int> distribution(0, wheel.size() - 1);
             int rand_var = distribution(generator);
             int rand_var2 = distribution(generator);
-            Chromosome parentOne = (wheel[rand_var]);
-            Chromosome parentTwo =  (wheel[rand_var2]);
+            Chromosome parentOne = members[wheel[rand_var]];
+            Chromosome parentTwo =  members[wheel[rand_var2]];
             Chromosome child = crossOver2(parentOne,parentTwo, numCrossoverChanges);
             //Chromosome child = crossOver3(parentOne,parentTwo);
             mutation(mutationPercent, child, numMutationChanges);
@@ -376,8 +376,8 @@ int main(int argc, const char * argv[]) {
      UNTIL population has converged
      STOP
      */
-    std::string sentence = "my name is bharddwaj vemulapalli";
-    int popsize = 2000;
+    std::string sentence = "to be or not to be that is the question.";
+    int popsize = 200;
     int mutationPercent = 25;
     int numMutationChanges = 1;
     int numCrossoverChanges = sentence.size()/2;
@@ -412,7 +412,7 @@ int main(int argc, const char * argv[]) {
     std::cout <<p.members[1].getGenes() << '\n';
     std::cout <<child.getGenes() << '\n';
      */
-    
+    int numPopulation =p.getNumPopulation();
     while(maxFitness != threshold ) {
         
          p.generateChildren3(numChildren, mutationPercent, numMutationChanges, numCrossoverChanges);
@@ -420,17 +420,15 @@ int main(int argc, const char * argv[]) {
         maxFitness = p.getMaxFitness();
         minFitness = p.minFitness();
         p.deletion(0);
-        if (maxFitness > 10) {
-            p.deletion(maxFitness - 5);
-        }
-        if (p.getNumPopulation() > 9000) {
-            p.deletion(maxFitness - 1);
+        numPopulation = p.getNumPopulation();
+        if (numPopulation > 9000) {
+            p.deletion(maxFitness - 8);
         }
         std::cout <<  "Max Fitness "<< maxFitness << ' ' << threshold << '\n';
         std::cout << "Min Fitness " << p.minFitness() << ' ' <<threshold << '\n';
         std::cout << "count " << count << '\n';
         count++;
-        std::cout << "Num Members " << p.getNumPopulation() << '\n';
+        std::cout << "Num Members " << numPopulation << '\n';
     }
     std::cout << p.getMostFitMember() << '\n';
     
