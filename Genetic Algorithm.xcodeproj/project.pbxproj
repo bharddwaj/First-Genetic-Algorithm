@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		01BEB1D822A48DD200A3CFC5 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 01BEB1D722A48DD200A3CFC5 /* main.cpp */; };
+		01D8807222A9DC7B00B8E411 /* Population.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 01D8807122A9DC7B00B8E411 /* Population.cpp */; };
+		01D8807522A9DDF100B8E411 /* Chromosome.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 01D8807322A9DDF100B8E411 /* Chromosome.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -25,6 +27,10 @@
 /* Begin PBXFileReference section */
 		01BEB1D422A48DD200A3CFC5 /* Genetic Algorithm */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "Genetic Algorithm"; sourceTree = BUILT_PRODUCTS_DIR; };
 		01BEB1D722A48DD200A3CFC5 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		01D8807022A9DBCA00B8E411 /* Population.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Population.h; sourceTree = "<group>"; };
+		01D8807122A9DC7B00B8E411 /* Population.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Population.cpp; sourceTree = "<group>"; };
+		01D8807322A9DDF100B8E411 /* Chromosome.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Chromosome.cpp; sourceTree = "<group>"; };
+		01D8807422A9DDF100B8E411 /* Chromosome.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Chromosome.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,6 +64,10 @@
 			isa = PBXGroup;
 			children = (
 				01BEB1D722A48DD200A3CFC5 /* main.cpp */,
+				01D8807022A9DBCA00B8E411 /* Population.h */,
+				01D8807122A9DC7B00B8E411 /* Population.cpp */,
+				01D8807322A9DDF100B8E411 /* Chromosome.cpp */,
+				01D8807422A9DDF100B8E411 /* Chromosome.hpp */,
 			);
 			path = "Genetic Algorithm";
 			sourceTree = "<group>";
@@ -118,7 +128,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				01D8807222A9DC7B00B8E411 /* Population.cpp in Sources */,
 				01BEB1D822A48DD200A3CFC5 /* main.cpp in Sources */,
+				01D8807522A9DDF100B8E411 /* Chromosome.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
