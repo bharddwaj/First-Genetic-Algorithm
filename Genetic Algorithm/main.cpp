@@ -14,10 +14,9 @@
 #include <map>
 #include "Population.h"
 //characters you can use in your phrase
-std::array<char, 29> characters = {'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x',
-    'y','z',' ', '?', '.'};
 
 
+//for some reason comma in the sentence does not work???
 
 int main(int argc, const char * argv[]) {
     
@@ -34,11 +33,15 @@ int main(int argc, const char * argv[]) {
      STOP
      */
     
-    std::string sentence = "to be or not to be";
+    
+    
+    std::string sentence = "to be or not to be, that is the real question? i wonder how good this algorithm really is though, lets test it out a bit.?!";
+    
     //std::cout << "Enter sentence that you wish the algorithm to guess " << '\n';
     //std::getline(std::cin,sentence) ;
-    int popsize = 200;
-    int mutationPercent = 1;
+    
+    int popsize = 500;
+    int mutationPercent = 25;
     int numMutationChanges = 1;
     int numCrossoverChanges = sentence.size()/2;
     int numChildren = 100; //used for generateChildren()
@@ -46,6 +49,7 @@ int main(int argc, const char * argv[]) {
     int threshold = sentence.size();
     Population p(sentence,popsize);
     int numPopulation = p.getNumPopulation();
+    p.getAllGenes();
     int stagnationCounter = 0;
     std::array<int,2> max_min = p.max_min_fitness();
     
@@ -59,6 +63,7 @@ int main(int argc, const char * argv[]) {
     std::cout << "Max Fitness " <<maxFitness << '\n';
     std::cout << "Min Fitness " <<minFitness << '\n';
     //p.deletion(0);
+    
     
    /*
      //this was me checking to see whether the mutation function was working
@@ -93,9 +98,11 @@ int main(int argc, const char * argv[]) {
     std::cout << "Max Fitness " <<maxFitness << '\n';
     std::cout << "Min Fitness " <<minFitness << '\n';
     */
+   /////////////////////////////////////////////////////
     
      //this is for CrossOver2
-    while(maxFitness != threshold ) {
+    int prevFitness = maxFitness;
+    while(maxFitness != threshold*threshold ) {
         
          p.generateChildren3(numChildren, mutationPercent, numMutationChanges, numCrossoverChanges);
         
@@ -104,17 +111,11 @@ int main(int argc, const char * argv[]) {
         minFitness = max_min[1];
         p.deletion(0);
         numPopulation = p.getNumPopulation();
+        
         if (numPopulation > 9000) {
             p.deletion(maxFitness - 8);
-            if (numPopulation > 16000) {
-                p.deletion(maxFitness - 1);
-            }
-           
         }
-        if (maxFitness >= threshold - 2) {
-            p.deletion(maxFitness - 3);
-        }
-        if (numPopulation > 30000) {
+        if (numPopulation > 15000) {
             std::cout << "BEGIN PRINTING STUFF" << '\n';
             p.getAllGenes();
             break;
@@ -126,15 +127,31 @@ int main(int argc, const char * argv[]) {
                 p.deletion(maxFitness - 1);
                 std::cout << "Beginning Mass Mutation" << '\n';
                 for (int i = 0; i < numPopulation; i++) {
-                    p.mutation(60, p.members[i], threshold - maxFitness);
+                    p.mutation(100, p.members[i], threshold - maxFitness);
                     
                 }
                 p.calcAllFitness();
                 stagnationCounter = 0;
             }
         }
-        std::cout <<  "Max Fitness "<< maxFitness << ' ' << threshold << '\n';
-        std::cout << "Min Fitness " << minFitness << ' ' <<threshold << '\n';
+        if (prevFitness == maxFitness) {
+            stagnationCounter++;
+            std::cout << "Stagnation Counter " << stagnationCounter << '\n';
+            if (stagnationCounter >= 20) {
+                p.deletion(maxFitness - 1);
+                std::cout << "Beginning Mass Mutation" << '\n';
+                for (int i = 0; i < numPopulation; i++) {
+                    p.mutation(100, p.members[i], threshold - maxFitness);
+                    
+                }
+                p.calcAllFitness();
+                stagnationCounter = 0;
+            }
+        }
+        
+        prevFitness = maxFitness;
+        std::cout <<  "Max Fitness "<< maxFitness << ' ' << threshold*threshold << '\n';
+        std::cout << "Min Fitness " << minFitness << ' ' <<threshold*threshold << '\n';
         std::cout << "count " << count << '\n';
         count++;
         std::cout << "Num Members " << numPopulation << '\n';

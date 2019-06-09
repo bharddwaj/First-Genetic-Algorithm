@@ -15,21 +15,26 @@ Chromosome::Chromosome (std::string sentence,int charlength){
         //constructor that initializes the chromosome with random genes of charlength
         //also gives the instance variable ans the value of the answer the algorithm is attempting to guess
         ans = sentence;
-        
+    
         std::random_device rd;
         std::mt19937 generator(rd());
-        std::uniform_int_distribution<int> distribution(0, characters.size() - 1); //29 is inclusive
+        std::uniform_int_distribution<int> distribution(0, characters.size() - 1); //31 is inclusive
         int rand_num = distribution(generator);
+    
         
         //std::srand(std::time(0)); //uses current time as a seed
         
         
         //const int min = 0;
-        //const int max = 29;
+        //const int max = 31;
         //int rand_num = std::rand() % min + max;
-        
+   
         for (int i = 0; i < charlength; i++) {
             genes.push_back(characters[rand_num]);
+            
+            std::random_device rd;
+            std::mt19937 generator(rd());
+            std::uniform_int_distribution<int> distribution(0, characters.size() - 1); //31 is inclusive
             rand_num = distribution(generator);
         }
     }
@@ -52,7 +57,7 @@ Chromosome::Chromosome (std::string sentence,int charlength){
                 score++;
             }
         }
-        fitness = score;
+        fitness = score*score;
     }
 int Chromosome::getFitness(void){
         //score is based on the number of the same characters in the answer vs the genes

@@ -186,6 +186,33 @@ Population::Population(std::string sent,int popsize){
         return parentOne;
         
     }
+Chromosome Population::crossOver4(Chromosome parentOne,Chromosome parentTwo){
+    //k-point crossover
+    std::random_device rd;
+    std::mt19937 generator(rd());
+    std::uniform_int_distribution<int> distribution2(1, members[0].getChromosomeLength()); // inclusive
+    int rand_num = distribution2(generator); //selecting point1
+    int rand_num_2 = distribution2(generator);//selecting point2
+    if (rand_num < rand_num_2) {
+        for (int i = rand_num; i < rand_num_2; i++) {
+            parentOne.genes[i] = parentTwo.genes[i];
+        }
+        return parentOne;
+    }
+    else if (rand_num > rand_num_2){
+        for (int i = rand_num_2; i < rand_num; i++) {
+            parentOne.genes[i] = parentTwo.genes[i];
+        }
+        return parentOne;
+    }
+    else{
+        //can't have rand_num == rand_num_2 or else there won't be any genes to switch
+        return crossOver4(parentOne, parentTwo);
+    }
+    
+    
+    return parentOne;
+}
     void Population::mutation(int mutationPercent,Chromosome &child,int numChanges){
         std::random_device rd;
         std::mt19937 generator(rd());
@@ -269,8 +296,8 @@ Population::Population(std::string sent,int popsize){
         int maxFitness = getMaxFitness();
         for (int i = 0; i < members.size(); i++) {
             fitness = members[i].fitness;
-            int limit = (((float)(fitness))/((float)(members[i].getChromosomeLength())))*100;
-            
+            int limit = (((float)(fitness))/((float)(members[i].getChromosomeLength())))*10; //multiply by 100 if not using fitness squared
+            //doing this because square fitness is what i am using
             for (int j = 0; j < limit; j++) {
                 wheel.push_back(i);
             }
@@ -286,8 +313,9 @@ Population::Population(std::string sent,int popsize){
             int rand_var2 = distribution(generator);
             Chromosome parentOne = members[wheel[rand_var]];
             Chromosome parentTwo =  members[wheel[rand_var2]];
-            Chromosome child = crossOver2(parentOne,parentTwo, numCrossoverChanges);
+            //Chromosome child = crossOver2(parentOne,parentTwo, numCrossoverChanges);
             //Chromosome child = crossOver3(parentOne,parentTwo);
+            Chromosome child = crossOver3(parentOne,parentTwo);
             mutation(mutationPercent, child, numMutationChanges);
             
             members.push_back(child);

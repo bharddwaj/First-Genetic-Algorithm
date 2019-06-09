@@ -34,6 +34,7 @@ public:
     void getAllGenes(void);
     Chromosome crossOver2(Chromosome parentOne,Chromosome parentTwo,int numChanges);
     Chromosome crossOver3(Chromosome parentOne,Chromosome parentTwo);
+    Chromosome crossOver4(Chromosome parentOne,Chromosome parentTwo);
     void mutation(int mutationPercent,Chromosome &child,int numChanges);
     void deletion(int threshold);
     int minFitness(void);

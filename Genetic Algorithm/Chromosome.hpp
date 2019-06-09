@@ -21,8 +21,8 @@ class Chromosome {
     
 public:
     //characters you can use in your phrase
-    std::array<char, 29> characters = {'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x',
-        'y','z',' ', '?', '.'};
+    std::array<char, 31> characters = {'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x',
+        'y','z',' ', '?', '.', ',', '!'};
     int fitness;
     std::vector<char> genes;
     std::basic_string<char> ans;
